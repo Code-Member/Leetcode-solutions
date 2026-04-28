@@ -1,0 +1,47 @@
+import java.util.*;
+
+class Solution {
+    public String reorganizeString(String s) {
+        int[] freq = new int[26];
+
+        // Count frequency
+        for (char c : s.toCharArray()) {
+            freq[c - 'a']++;
+        }
+
+        // Max heap based on frequency
+        PriorityQueue<int[]> pq = new PriorityQueue<>(
+            (a, b) -> b[1] - a[1]
+        );
+
+        for (int i = 0; i < 26; i++) {
+            if (freq[i] > 0) {
+                pq.offer(new int[]{i, freq[i]});
+            }
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        while (pq.size() >= 2) {
+            int[] first = pq.poll();
+            int[] second = pq.poll();
+
+            // Append two most frequent chars
+            result.append((char)(first[0] + 'a'));
+            result.append((char)(second[0] + 'a'));
+
+            // Decrease counts and push back if still available
+            if (--first[1] > 0) pq.offer(first);
+            if (--second[1] > 0) pq.offer(second);
+        }
+
+        // If one character left
+        if (!pq.isEmpty()) {
+            int[] last = pq.poll();
+            if (last[1] > 1) return ""; // not possible
+            result.append((char)(last[0] + 'a'));
+        }
+
+        return result.toString();
+    }
+}
